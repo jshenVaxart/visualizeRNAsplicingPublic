@@ -1,6 +1,9 @@
 #!/ bin/bash
 
-docker run -it --gpus all -v /vaxart-batch-input/MinionData/D/APRIL192023/GD102/HIEC-6_GD102_48hpi/20230419_1038_MN38318_FAV69906_9d58ac2e/fast5:/input -v /root/vaxart-batch-output/outputApril192023JS/:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/guppy guppy_basecaller -i /input -s /output -c dna_r9.4.1_450bps_sup.cfg -x "cuda:0"
+docker run -it --gpus all \
+-v /vaxart-batch-input/MinionData/D/APRIL192023/GD102/HIEC-6_GD102_48hpi/20230419_1038_MN38318_FAV69906_9d58ac2e/fast5:/input \
+-v /root/vaxart-batch-output/outputApril192023JS/:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/guppy guppy_basecaller \
+-i /input -s /output -c dna_r9.4.1_450bps_sup.cfg -x "cuda:0"
 
 search_dir="/root/vaxart-batch-output/outputApril192023JS/pass"
 for entry in $search_dir/*
@@ -53,9 +56,29 @@ minimap2 -t 4 -ax map-ont -p 0 -N 10 transcriptome.fa.gz reads.fastq.gz
   minimap2 -t 4 -ax map-ont -p 0 -N 10 --MD --eqx ${genome}/transcriptome_human.fa minimap/${params.runid}.fastq -o minimap/${params.runid}_transcriptome_human.bam
   minimap2 -t 4 -ax map-ont -p 0 -N 10 --MD --eqx ${genome}/transcriptome_ad.fa minimap/${params.runid}.fastq -o minimap/${params.runid}_transcriptome_ad.bam
     -f FLOAT     filter out top FLOAT fraction of repetitive minimizers [0.0002]
-    -u CHAR      how to find GT-AG. f:transcript strand, b:both strands, n:don't match GT-AG [n]
+    -u CHAR      how to find GT-AG. f:transcript strand, b:both strands, n:dont match GT-AG [n]
 ##why sam instead of bam??? a gives sam right
     -t INT       number of threads [3]
 
 ###from stringtie2
 -splice
+
+
+
+ minimap2 --sam-hit-only --MD -ax splice -uf -k14 --eqx ${genome}/reference.fa minimap/${params.runid}.fastq -o minimap/${params.runid}_reference.bam
+
+##i undersatnd the transcriptiome but not hte reference?? and wy no splice here?
+  minimap2 --sam-hit-only --MD -ax splice -uf -t 4 -ax map-ont -p 0 -N 10 --MD --eqx \
+  /vaxart-batch-input/Reference_Transcriptome/Transcriptome_Jun162022.fa/transcriptome.fa \
+  vaxart-batch-output/outputApril192023JS/pass/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c_0_0.fastq \
+  -o minimap/${params.runid}_reference.bam
+
+  
+  ${genome}/transcriptome_human.fa minimap/${params.runid}.fastq \
+  -o minimap/${params.runid}_transcriptome_human.bam
+
+
+
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/outputApril192023JS/minimap:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 \
+samtools index /output/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c.bam
