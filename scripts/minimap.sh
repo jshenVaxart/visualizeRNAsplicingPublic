@@ -35,9 +35,6 @@ docker run -v /vaxart-batch-input:/input -v /vaxart-batch-output/outputApril1920
 /input/outputApril192023JS/pass/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c.fastq \
 -o /output/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c.bam
 
- samtools sort ${folder}/${params.runid}.bam -o samtools/${params.runid}_sorted.bam
-  samtools index samtools/${params.runid}_sorted.bam samtools/${params.runid}_sorted.bam.bai
-
 
 docker run -v /vaxart-batch-input/:/input \
 -v /vaxart-batch-output/:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 samtools \
