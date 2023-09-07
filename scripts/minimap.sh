@@ -76,3 +76,36 @@ docker run -v /vaxart-batch-input/:/input \
 -v /vaxart-batch-output/outputApril192023JS/minimap:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 \
 samtools index /output/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c_sorted.bam /output/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c_sorted.bam.bai
 
+docker run -v /vaxart-batch-input:/input -v /vaxart-batch-output/outputApril192023JS/minimap:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 minimap2 \
+--sam-hit-only --MD -ax splice -uf -k14 --eqx -L --cs='long'-c \
+/input/Reference_genome/GD102_Ad-CMV-VP8_GS-S2_Cyto-T2A-VP6_GS-BGH-SV40-Luc-SPA.fa \
+/input/outputApril192023JS/pass/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c.fastq \
+-o /output/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c_cs.bam
+
+
+##should we use no secondary mapping also? it's kind of confusing
+docker run -v /vaxart-batch-input:/input -v /vaxart-batch-output/20230830_1145_MN40653_FAW69791_f5030989/:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 minimap2 \
+--sam-hit-only --MD -ax splice -uf -k14 --eqx --secondary=no \
+/output/reference/reference.fa \
+/output/minimap/20230830_1145_MN40653_FAW69791_f5030989.fastq \
+-o /output/minimap/20230830_1145_MN40653_FAW69791_f5030989_noSecondary.bam
+
+#samtools sort
+
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/20230830_1145_MN40653_FAW69791_f5030989:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 samtools \
+sort /output/minimap/20230830_1145_MN40653_FAW69791_f5030989_noSecondary.bam -o /output/samtools/reference/20230830_1145_MN40653_FAW69791_f5030989_noSecondary_sorted.bam
+
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/20230830_1145_MN40653_FAW69791_f5030989:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 samtools \
+index /output/samtools/reference/20230830_1145_MN40653_FAW69791_f5030989_noSecondary_sorted.bam \
+/output/samtools/reference/20230830_1145_MN40653_FAW69791_f5030989_noSecondary_sorted.bam.bai
+
+##can we try to put the junctions back and then see if it improves the mapping score?
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/20230419_1038_MN38318_FAV69906_9d58ac2e:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 samtools \
+view /output/minimap/fastq_runid_987888c28bdbf219178d381fcc2a6fa077bd974c_sorted.bam \
+-h -b -q 30 -U below_q30.bam aligned.bam
+
+##minimap to map the fasta file back to the reference and see if it's any different?
+##but we should also filter out some of the reads?

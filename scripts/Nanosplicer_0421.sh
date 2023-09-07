@@ -20,3 +20,16 @@ docker run -v /vaxart-batch-input/:/input \
 -v /vaxart-batch-output/20230421_1447_MN38318_FAV67540_45e9a799/:/output 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanopanel2 \
 samtools index /output/minimap/20230421_1447_MN38318_FAV67540_45e9a799_manual_sorted.bam /output/minimap/20230421_1447_MN38318_FAV67540_45e9a799_manual_sorted.bam.bai
 
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/outputApril192023JS/:/output -it 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanosplicer bash
+conda activate NanoSplicer
+python /app/NanoSplicer/bin/JWR_checker.py \
+--output_csv /output/minimap/.bam /output/nano_splicer/20230421_1447_MN38318_FAV67540_45e9a799_manual_sorted.bam.h5
+
+
+docker run -v /vaxart-batch-input/:/input \
+-v /vaxart-batch-output/20230421_1447_MN38318_FAV67540_45e9a799/:/output -it 620901718958.dkr.ecr.us-east-2.amazonaws.com/nanosplicer bash
+
+python /app/NanoSplicer/bin/JWR_checker.py \
+--output_csv /output/minimap/.bam /output/nano_splicer/20230421_1447_MN38318_FAV67540_45e9a799_manual_sorted.bam.h5
+
