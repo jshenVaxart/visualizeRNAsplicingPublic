@@ -3,4 +3,11 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("igvR",dependencies=TRUE)
 library(igvR)
-
+igv <- igvR()
+setBrowserWindowTitle(igv, "0_0fastq")
+setGenome(igv, "grch38")
+roi <- getGenomicRegion(igv)
+gr.roi <- with(roi, GRanges(seqnames=chrom, ranges = IRanges(start, end)))
+param <- ScanBamParam(which=gr.roi, what = scanBamWhat())
+bamFile <- system.file(package="igvR", "extdata", "ctcf-gata2", "gata2-region-hg19.bam")
+alignments <- readGAlignments(bamFile, use.names=TRUE, param=param)
